@@ -236,6 +236,25 @@ function newMessage(message, sent_by_id, thread_id, is_channel, sender_name, fil
                         <span class="msg_time">${formattedDate}</span>
                     </div>
                 `
+            } else if (file_type == 'video') {
+                message_element = `
+                        <div class="msg_receive">
+                        <div class="msg_send_name">${sender_name}</div>
+                        <div class="d-flex mb-4 received">
+                            <div class="img_cont_msg">
+                                <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded-circle user_img_msg">
+                            </div>
+                        
+                            <div class="msg_cotainer">
+                                <video width="320" height="240" controls>
+                                <source src="${file}" type="video/mp4">
+                                Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                        <span class="msg_time">${formattedDate}</span>
+                    </div>
+                `
             } else {
                 message_element = `
                     <div class="msg_receive">

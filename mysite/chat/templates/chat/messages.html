@@ -425,6 +425,11 @@
                                                         {% else %}
                                                             {% if chat.file_type == 'image' %}
                                                                 <img src="{{chat.file}}" width= 200px>
+                                                            {% elif chat.file_type == 'video'%}
+                                                                <video width="320" height="240" controls>
+                                                                    <source src="{{chat.file}}" type="video/mp4">
+                                                                    Your browser does not support the video tag.
+                                                                </video>
                                                             {% else %}
                                                                 <a href="{{chat.file}}" download>{{chat.message}}</a>
                                                             {% endif %}
@@ -475,10 +480,6 @@
                                         {% endif %}
                                         
                                     </div>
-                                    {% comment %} <div class="video_cam">
-                                        <span><i class="fas fa-video"></i></span>
-                                        <span><i class="fas fa-phone"></i></span>
-                                    </div> {% endcomment %}
                                 </div>
                                 <span class="action_menu_btn" chat-id="chat_{{ thread.id }}" is-channel="0"><i class="fas fa-ellipsis-v"></i></span>
                                 <div class="action_menu hide" chat-id="chat_{{ thread.id }}" is-channel="0">
@@ -490,9 +491,6 @@
                                                 {{ thread.first_person.name }}
                                             {% endif %}
                                         </li>
-                                        {% comment %} <li><i class="fas fa-users"></i> Add to close friends</li>
-                                        <li><i class="fas fa-plus"></i> Add to group</li>
-                                        <li><i class="fas fa-ban"></i> Block</li> {% endcomment %}
                                     </ul>
                                 </div>
                             </div>
@@ -509,6 +507,11 @@
                                                     {% else %}
                                                         {% if chat.file_type == 'image' %}
                                                             <img src="{{chat.file}}" width= 200px>
+                                                        {% elif chat.file_type == 'video'%}
+                                                            <video width="320" height="240" controls>
+                                                                <source src="{{chat.file}}" type="video/mp4">
+                                                                Your browser does not support the video tag.
+                                                            </video>
                                                         {% else %}
                                                             <a href="{{chat.file}}" download>{{chat.message}}</a>
                                                         {% endif %}
@@ -534,6 +537,11 @@
                                                     {% else %}
                                                         {% if chat.file_type == 'image' %}
                                                             <img src="{{chat.file}}" width= 200px>
+                                                        {% elif chat.file_type == 'video'%}
+                                                            <video width="320" height="240" controls>
+                                                                <source src="{{chat.file}}" type="video/mp4">
+                                                                Your browser does not support the video tag.
+                                                            </video>
                                                         {% else %}
                                                             <a href="{{chat.file}}" download>{{chat.message}}</a>
                                                         {% endif %}
