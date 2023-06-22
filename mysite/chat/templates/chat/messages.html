@@ -1,0 +1,666 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Chat</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
+
+        <link rel="stylesheet" href="{% static 'css/messages.css' %}">
+
+    </head>
+	<body>
+        {% comment %} <p style="text-align: end; padding-right: 50px; padding-top: 10px; margin-bottom: 0rem;">Logged in as : {{ user_name }}:
+            <a href="{{'logout'}}" class="btn btn-info btn-lg">
+              <span class="glyphicon glyphicon-log-out"></span> Log out
+            </a>
+          </p> {% endcomment %}
+        <input type="hidden" id="logged-in-user" value="{{user_id}}">
+		<div class="container-fluid h-100">
+			<div class="row justify-content-center h-100 ">
+				<div class="col-md-4 col-xl-3 chat h-100 mt-4">
+                    <div class="card mb-sm-3 mb-md-0 contacts_card">
+                        
+                        {% comment %} <div class="card-header">
+                            <div class="input-group">
+                                <input type="text" placeholder="Search..." name="" class="form-control search">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                                </div>
+                            </div>
+                        </div> {% endcomment %}
+
+                        <div class="card-header">
+                            <span class="msg-box" style="position: relative; left: 60px; cursor: pointer; color: #fcfcfc">                                
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-chat-left-dots-fill" viewBox="0 0 16 16">
+                                        <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                      </svg>
+                            </span>
+                            <span class="notification-box" style="position: relative; left: 100px; cursor: pointer; color: #fcfcfc">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
+                                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+                                      </svg>
+                            </span>
+                            <span class="menu-box" style="position: relative; left: 140px; cursor: pointer; color: #fcfcfc">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                      </svg>
+                            </span>
+                        </div>
+                        <!--contact body-->
+                        <div class="card-body contacts_body hide is_active">
+                            <div class="contact_toggle">
+                                <span style="cursor: pointer;">Direct Message</span>
+                            </div>
+                            <ui class="contacts hide is_active">
+                                {% for thread in Threads %}
+                                    <li class="contact-li" chat-id="chat_{{ thread.id }}" is-channel="0" style="cursor: pointer">
+                                        <div class="d-flex bd-highlight">
+                                            <div class="img_cont_contact">
+                                                <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded user_img_contact">
+                                                <span class="online_icon"></span>
+                                            </div>
+                                            <div class="user_info">
+
+                                                {% if thread.first_person.id == user_id %}
+                                                    <span> {{thread.second_person.name}}</span>
+                                                {% else %}
+                                                <span> {{thread.first_person.name}}</span>
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ui>
+
+                            <div class="channel_toggle">
+                                <span style="cursor: pointer;">Channel</span>
+                            </div>
+                            <ui class="channel hide is_active">
+                                    {% for channel in channels %}
+                                        {% if channel.private == True %}
+                                            <li class="{% if forloop.first %}active{% endif %} contact-li" chat-id="chat_{{ channel.id }}" is-channel="1" style="cursor: pointer">
+                                                <div class="d-flex bd-highlight">
+                                                    <div class="channel_info">
+                                                        <span>#{{channel.channelName}} &#x1F512</span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% else %}
+                                            <li class="{% if forloop.first %}active{% endif %} contact-li" chat-id="chat_{{ channel.id }}" is-channel="1" style="cursor: pointer">
+                                                <div class="d-flex bd-highlight">
+                                                    <div class="channel_info">
+                                                        <span>#{{channel.channelName}}</span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <li class="contact-l" style="cursor: pointer">
+                                        <div class="d-flex bd-highlight">
+                                            <div class="channel_info">
+                                                <span id="myBtn"> + Add New Channel</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                            </ui>
+
+                            <!-- Channel Modal -->
+                            <div id="myModal" class="modal">
+
+                                <!--  Modal content -->
+                                <div class="modal-content">
+                                <span class="close">&times;</span>
+                                
+                                    <div class="mb-md-5 mt-md-4 ">
+
+                                        <h2 class="fw-bold mb-2 text-uppercase">Create New Channel</h2>
+                                        <p class="text-white-50 mb-5">Please enter your information</p>
+                                        {% if error %}
+                                            <p class="text-danger" style="color: #ef6371!important;">{{error}}</p>
+                                        {% endif %}
+                                        <form action="{% url 'createChannel' %}" method="post">
+                                            {% csrf_token %}
+                                            <div class="form-outline form-white mb-4">
+                                                <input type="text" id="typeChannelNameX" class="form-control form-control-lg"
+                                                    placeholder="Enter Channel name" name="channelName" required />
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="checked" id="defaultCheck1" name="checkbox">
+                                                <label class="form-check-label" for="defaultCheck1">
+                                                  Private Channel
+                                                </label>
+                                            </div>
+                               
+                                            <button class="btn btn-outline-light btn-lg px-5" type="submit">Create</button>
+                                        </form>
+                                    </div>
+
+                                </div>                            
+                            </div>
+                            <!-- Channel Modal End-->
+                            
+                            <!--Add Teammate Start-->
+                            <div class="add_teammate">
+                                <span id='myTeamBtn' style="cursor: pointer;">+Add New Teammate</span>
+                            </div>
+
+                            <!--Teammate Modal -->
+                            <div id="myTeamModal" class="teamModal">
+
+                                <!-- Modal content -->
+                                <div class="team_modal-content">
+                                    <span class="teamClose">&times;</span>
+                                
+                                    <div class="mb-md-5 mt-md-4 ">
+
+                                        <h2 class="fw-bold mb-2 text-uppercase">Add New Teammate</h2>
+                                        <p class="text-white-50 mb-5">Please enter your information</p>
+                                        {% if error %}
+                                            <p class="text-danger" style="color: #ef6371!important;">{{error}}</p>
+                                        {% endif %}
+                                        <div class="input-group">
+                                            <input type="text" placeholder="Search..." name="" class="form-control search" id="search-input-add">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                                            </div>
+                                        </div>
+                                        <ul id="data-list-add">
+                                            {% for user_obj in users_not_in_workspace %}
+                                            <li  style="display:none; color:white; cursor: pointer;">
+                                                {{user_obj.name}}
+                                                <span class="teammate-form">
+                                                    <form action="{% url 'invitationSend' %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="userID" value="{{user_obj.id}}">                                
+                                                        <button class="btn btn-success" type="submit">Send Invite</button>
+                                                    </form>
+                                                </span>
+                                            </li>
+                                            {% endfor %}                            
+                                          </ul>
+                                    </div>
+
+                                </div>                            
+                            </div>
+                            <!--Teammate Modal End-->
+
+
+                            <!--Add Teammate End-->
+
+
+                        </div>
+
+                        <!--Notification Body-->
+                        <div class="card-body notification_body hide">
+                            <div class="input-group">
+                                <input type="text" placeholder="Search for member" name="" class="form-control search" id="search-input">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                                </div>
+                            </div>
+                            <ul id="data-list">
+                                {% for user_obj in user_list %}
+                                <li  style="color:white;">
+                                    {{user_obj.name}}
+                                    {% if workspace_owner.createdBy.id == user_id and user_obj.id != user_id %}
+                                    <span class="teammate-form">
+                                        <form action="{% url 'removeWorkspace' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="userID" value="{{user_obj.id}}">                                
+                                            <button class="btn btn-success" type="submit">Remove</button>
+                                        </form>
+                                    </span>
+                                    {% elif user_obj.id == user_id %}
+                                    <span class="teammate-form">
+                                        <form action="{% url 'leaveWorkspace' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="userID" value="{{user_obj.id}}">                                
+                                            <button class="btn btn-success" type="submit">Leave</button>
+                                        </form>
+                                    </span>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                              </ul>
+
+                              <!--Search file start-->
+                              <br>
+                              <br>
+                            <div class="input-group">
+                                <input type="text" placeholder="Search for file" name="" class="form-control search" id="search-input-file">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                                </div>
+                            </div>
+
+                            <ul id="data-list-file">
+                                {% for file in all_file %}
+                                <li  style="display:none; color:white;">
+                                    {{file.message}}
+                                    <span class="search-file">
+                                        <a href="{{file.file}}" download>
+                                            <button class="btn btn-success" type="submit">Download</button>
+                                        </a>
+                                    </span>                                 
+                                </li>
+                                {% endfor %}
+                              </ul>
+                              <!--Search file end-->
+                        </div>
+                        <!--Menu Body-->
+                        <div class="menu_body hide">
+                            <ul>
+                                <li style="cursor: auto;"><i class="fas fa-user-circle"></i>{{ user_name }}</li>
+                                <a href="{{'logout'}}"><li><i class="fas fa-ban"></i>Logout for User</li></a>
+                                <a href="{{'workspacelogout'}}"><li><i class="fas fa-ban"></i>Logout for Workspace</li></a>
+                            </ul>
+                        </div>
+
+					<div class="card-footer"></div>
+				</div>
+            </div>
+                    <!-- Edited From Here-->
+				<div class="col-md-8 col-xl-9 chat h-100 mt-4">
+					<div class="card">
+                        <!--Channel Portion Start-->
+                        {% for channel in channels %}
+                            <div class="messages-wrapper {% if forloop.first %}hide is_active{% else %}hide{% endif %}" chat-id="chat_{{ channel.id }}" is-channel="1" other-user-id="{{workspaceID}}">
+                            
+                                <div class="card-header msg_head">
+                                    <div class="d-flex bd-highlight">
+                                        <div class="img_cont">
+                                            <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded-circle user_img">
+                                            <span class="online_icon"></span>
+                                        </div>
+                                        <div class="user_info">
+                                            <span>#{{ channel.channelName }}</span>                                            
+                                        </div>
+                                        {% comment %} <div class="video_cam">
+                                            <span><i class="fas fa-video"></i></span>
+                                            <span><i class="fas fa-phone"></i></span>
+                                        </div> {% endcomment %}
+                                    </div>
+                                    <span class="action_menu_btn" chat-id="chat_{{ channel.id }}" is-channel="1"><i class="fas fa-ellipsis-v"></i></span>
+                                    <div class="action_menu hide" chat-id="chat_{{ channel.id }}" is-channel="1">
+                                        <ul>
+                                            <li><i class="fas fa-users"></i> {{ channel.channelName }}</li>
+                                            <li><i class="fas fa-user-lock"></i> Created by {{channel.created_by.name}}</li>
+                                            {% if channel.private == True and channel.created_by.id == user_id %}
+                                            <li class="addChannelMemberBtn" chat-id="{{channel.id}}"><i class="fas fa-plus"></i> Add to group</li>
+                                            {% endif %}
+                                            {% if channel.created_by.id == user_id %}
+                                            <li class="delChannelBtn" chat-id="{{channel.id}}"><i class="fas fa-trash"></i>Delete</li>                                          
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    <!--Delete Channel Modal content -->
+                                    {% if channel.created_by.id == user_id %}                                        
+                                    
+                                        <div class="channelDelmodal" chat-id="{{ channel.id }}">
+                                            <!--  Modal content -->
+                                            <div class="channelDel-modal-content">
+                                                <span class="channelDelClose" chat-id="{{channel.id}}">&times;</span>
+                                            
+                                                <div class="mb-md-5 mt-md-4 ">        
+                                                    <h2 class="fw-bold mb-2 text-uppercase">Are you sure to delete {{channel.channelName}}?</h2>
+                                                    {% if error %}
+                                                        <p class="text-danger" style="color: #ef6371!important;">{{error}}</p>
+                                                    {% endif %}
+                                                    <form action="{% url 'deleteChannel' %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="chatID" value="{{channel.id}}">
+                                                        <input type="submit" name="delChannel" class="btn btn-success" value="No">
+                                                        <input type="submit" name="delChannel" class="btn btn-danger" value="Yes" style="margin-left: 15px">
+                                                    </form>
+                                                </div>        
+                                            </div>                            
+                                        </div>
+                                    {% endif %}
+                                    <!-- Delete Channel Modal content end -->
+
+                                    <!--Add Member to channel Modal Start-->
+                                    {% if channel.private == True and channel.created_by.id == user_id %}
+                                    
+                                        <div class="channelMemberModal" chat-id="{{channel.id}}">
+
+                                            <!-- Modal content -->
+                                            <div class="addChannelMemberModal-content">
+                                                <span class="addChannelMemberModalClose" chat-id="{{channel.id}}">&times;</span>
+                                            
+                                                <div class="mb-md-5 mt-md-4 ">
+            
+                                                    <h2 class="fw-bold mb-2 text-uppercase">Add New Member</h2>
+                                                    
+                                                    {% if error %}
+                                                        <p class="text-danger" style="color: #ef6371!important;">{{error}}</p>
+                                                    {% endif %}
+                                                    <div class="input-group">
+                                                        <input type="text" placeholder="Search..." name="" class="form-control search" id="search-input-channel">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                    <ul id="data-list-channel">                      
+                                                        {% with my_list=not_private_channel_users|get_item:channel.id %}
+                                                        {% for user_obj in my_list%}
+                                                        <li  style="color:white; cursor: pointer;">
+                                                            {{user_obj.name}}
+                                                            <span class="teammate-form">
+                                                                <form action="{% url 'addChannelMember' %}" method="post">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="userID" value="{{user_obj.id}}">                              
+                                                                    <input type="hidden" name="channelID" value="{{channel.id}}">                              
+                                                                    <button class="btn btn-success" type="submit">Add</button>
+                                                                </form>
+                                                            </span>
+                                                        </li>
+                                                        {% endfor %}   
+                                                        {% endwith %}
+                                                    </ul>
+                                                </div>
+            
+                                            </div>                            
+                                        </div>
+                                    {% endif %}
+
+                                    <!--Add Member to channel Modal End-->
+
+                                </div>
+
+                                <div class="card-body msg_card_body">
+                                    {% for chat in channel.message_channel.all %}
+                                        {% if chat.send_by.id == user_id %}
+                                            <div class="msg_send">
+                                                <div class="d-flex mb-4 replied">                        
+                                                    <div class="msg_cotainer_send">
+                                                        {% if chat.has_file == '0' %}
+                                                            {{chat.message}}                                                            
+                                                        {% else %}
+                                                            {% if chat.file_type == 'image' %}
+                                                                <img src="{{chat.file}}" width= 200px>
+                                                            {% elif chat.file_type == 'video'%}
+                                                                <video width="320" height="240" controls>
+                                                                    <source src="{{chat.file}}" type="video/mp4">
+                                                                    Your browser does not support the video tag.
+                                                                </video>
+                                                            {% else %}                                                         
+                                                                <a href="{{chat.file}}" download>{{chat.message}}</a>
+                                                            {% endif %}
+                                                        {% endif %}                                                      
+                                                    </div>
+                                                    <div class="img_cont_msg">
+                                                        <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded-circle user_img_msg">
+                                                    </div>
+                                                </div>
+                                                <span class="msg_time_send">{{ chat.time|date:"g:i A, F j, Y" }}</span>
+                                                {% if chat.message_seen_by.all %}                                                    
+                                                    <span class='seen_by'>                                                        
+                                                        Seen by
+                                                        {% for seen_by in chat.message_seen_by.all %}
+                                                            , {{seen_by.seen_by.name}}
+                                                        {% endfor %}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            
+                                            
+                                            <div class="msg_receive">
+                                                <div class="msg_send_name">{{chat.send_by.name}}</div>
+                                                <div class="d-flex mb-4 received">
+                                                    <div class="img_cont_msg">
+                                                        <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded-circle user_img_msg">
+                                                    </div>
+                                                
+                                                    <div class="msg_cotainer">
+                                                        {% if chat.has_file == '0' %}
+                                                            {{chat.message}}
+                                                        {% else %}
+                                                            {% if chat.file_type == 'image' %}
+                                                                <img src="{{chat.file}}" width= 200px>
+                                                            {% else %}
+                                                                <a href="{{chat.file}}" download>{{chat.message}}</a>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <span class="msg_time">{{ chat.time|date:"g:i A, F j, Y" }}</span>
+                                                {% if chat.message_seen_by.all %}                                                    
+                                                    <span class='seen_by_recieve'>                                                        
+                                                        Seen by
+                                                        {% for seen_by in chat.message_seen_by.all %}
+                                                            , {{seen_by.seen_by.name}}
+                                                        {% endfor %}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                        {% endif %}
+                                    {% endfor %}   
+
+                                </div>
+					        </div>
+                        {% endfor %}
+                        <!--Channel Portion END-->
+
+                        <!--Direct Portion Start-->
+                        
+                        {% for thread in Threads %}
+                        <div class="messages-wrapper hide" chat-id="chat_{{ thread.id }}" is-channel="0"  other-user-id="
+                                    {% if thread.first_person.id == user_id %}
+                                        {{ thread.second_person.id }}
+                                    {% else %}
+                                        {{ thread.first_person.id }}
+                                    {% endif %}
+                                ">
+                        
+                            <div class="card-header msg_head">
+                                <div class="d-flex bd-highlight">
+                                    <div class="img_cont">
+                                        <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded-circle user_img">
+                                        <span class="online_icon"></span>
+                                    </div>
+                                    <div class="user_info">
+                                        {% if thread.first_person.id == user_id %}
+                                                <span>{{ thread.second_person.name }}</span>
+                                        {% else %}
+                                            <span>{{ thread.first_person.name }}</span>
+                                        {% endif %}
+                                        
+                                    </div>
+                                    {% comment %} <div class="video_cam">
+                                        <span><i class="fas fa-video"></i></span>
+                                        <span><i class="fas fa-phone"></i></span>
+                                    </div> {% endcomment %}
+                                </div>
+                                <span class="action_menu_btn" chat-id="chat_{{ thread.id }}" is-channel="0"><i class="fas fa-ellipsis-v"></i></span>
+                                <div class="action_menu hide" chat-id="chat_{{ thread.id }}" is-channel="0">
+                                    <ul>
+                                        <li><i class="fas fa-user-circle"></i>
+                                            {% if thread.first_person.id == user_id %}
+                                                {{ thread.second_person.name }}
+                                            {% else %}
+                                                {{ thread.first_person.name }}
+                                            {% endif %}
+                                        </li>
+                                        {% comment %} <li><i class="fas fa-users"></i> Add to close friends</li>
+                                        <li><i class="fas fa-plus"></i> Add to group</li>
+                                        <li><i class="fas fa-ban"></i> Block</li> {% endcomment %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="card-body msg_card_body">
+                                {% for chat in thread.chatmessage_thread.all %}
+                                    {% if chat.send_by.id == user_id %}                               
+                                
+                                        <div class="msg_send">
+                                            <div class="d-flex mb-4 replied">
+                                                <div class="msg_cotainer_send">
+                                                    {% if chat.has_file == '0' %}
+                                                            {{chat.message}}
+                                                    {% else %}
+                                                        {% if chat.file_type == 'image' %}
+                                                            <img src="{{chat.file}}" width= 200px>
+                                                        {% else %}
+                                                            <a href="{{chat.file}}" download>{{chat.message}}</a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                                <div class="img_cont_msg">
+                                                    <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded-circle user_img_msg">
+                                                </div>
+                                            </div>
+                                            <span class="msg_time_send">{{ chat.date_time|date:"g:i A, F j, Y" }}</span>
+                                        </div>
+                                    
+                                    {% else %}
+                                        <div class="msg_receive">
+                                            <div class="msg_send_name">{{chat.send_by.name}}</div>
+                                            <div class="d-flex mb-4 received">
+                                                <div class="img_cont_msg">
+                                                    <img src="http://127.0.0.1:8000/media/DP.jpg" class="rounded-circle user_img_msg">
+                                                </div>
+                                                <div class="msg_cotainer">
+                                                    {% if chat.has_file == '0' %}
+                                                            {{chat.message}}
+                                                    {% else %}
+                                                        {% if chat.file_type == 'image' %}
+                                                            <img src="{{chat.file}}" width= 200px>
+                                                        {% else %}
+                                                            <a href="{{chat.file}}" download>{{chat.message}}</a>
+                                                        {% endif %}
+                                                    {% endif %}                                                    
+                                                </div>
+                                            </div>
+                                            <span class="msg_time">{{ chat.date_time|date:"g:i A, F j, Y" }}</span>
+                                        </div>
+                                        
+                                    {% endif %}
+                                {% endfor %}   
+
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                        <!--Direct Portion END-->
+
+                            <div class="card-footer">
+                                <form id="send-message-form">
+                                    <div class="input-group">
+                                        <div class="input-group-append">
+                                            <input type="file" name="" id="file-message" class="form-control type_msg" style="display:none;">
+                                            <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
+                                        </div>
+                                        <input type="text" name="" id="input-message" class="form-control type_msg" placeholder="Type your message...">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-secondary" id="send_i_button" type="submit">
+                                                <span class="input-group-text send_btn">
+                                                    <i class="fas fa-location-arrow"></i>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div id="image-preview-container"></div>
+                            </div>                        
+                    </div>
+				</div>
+
+                <!-- Edited End Here-->
+			</div>
+		</div>
+
+        <script src="{% static 'js/messages.js' %}"></script>
+        <script>
+            // Input file option
+            const attachBtn = document.querySelector('.attach_btn');
+            const fileInput = document.querySelector('#file-message');
+            attachBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Get the modal
+            var modal = document.getElementById("myModal");
+            var teamModal = document.getElementById("myTeamModal");
+    
+            // Get the button that opens the modal
+            var btn = document.getElementById("myBtn");
+            var teamBtn = document.getElementById("myTeamBtn");
+    
+            // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close")[0];
+            var teamSpan = document.getElementsByClassName("teamClose")[0];
+    
+            // When the user clicks the button, open the modal 
+            btn.onclick = function () {
+                modal.style.display = "block";
+                console.log("Clicked")
+            }
+
+            teamBtn.onclick = function () {
+                teamModal.style.display = "block";
+                console.log("Clicked")
+            }
+            
+            $('.delChannelBtn').on('click', function(event){
+                let chat_id = $(this).attr('chat-id')
+                $('.channelDelmodal[chat-id="' + chat_id + '"]').css('display', 'block');
+                console.log('Clicked')
+            });
+
+            $('.addChannelMemberBtn').on('click', function(event){
+                let chat_id = $(this).attr('chat-id')
+                $('.channelMemberModal[chat-id="' + chat_id + '"]').css('display', 'block');
+                console.log('Clicked')
+            });
+    
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+
+            teamSpan.onclick = function () {
+                teamModal.style.display = "none"
+            }
+            
+            $('.channelDelClose').on('click', function(event){
+                let chat_id = $(this).attr('chat-id')
+                $('.channelDelmodal[chat-id="' + chat_id + '"]').css('display', 'none');
+                console.log('Clicked')
+            });
+
+            $('.addChannelMemberModalClose').on('click', function(event){
+                let chat_id = $(this).attr('chat-id')
+                $('.channelMemberModal[chat-id="' + chat_id + '"]').css('display', 'none');
+                console.log('Clicked')
+            });
+    
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal || event.target == teamModal) {
+                    modal.style.display = "none";
+                    teamModal.style.display = "none";
+                }
+            }             
+        </script>
+
+        
+    <style>
+        .image-preview {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        margin-right: 10px;
+        }
+    </style>
+
+	</body>
+</html>

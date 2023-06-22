@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WorkSpace</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+        integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'css/messages.css' %}">
+
+</head>
+
+<body>
+
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-10 col-lg-6 col-xl-8">
+                    <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                        <div class="card-body p-5 text-center">
+                            <h1>{{user_name}}'s WorkSpace</h1>
+    
+
+                            <div class="container" style="margin-top: 30px;">
+                                <ul class="list-group">                              
+                                  {% for workspace_obj in work_spaces %}
+                                  <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">
+                                    <b style='font-size: 15px'>{{ workspace_obj.workspace.workspaceName}}</b>
+                                    <form action="{% url 'chat_page'%}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="workspaceID" value="{{workspace_obj.workspace.id}}">
+                                        <input type="submit" class="btn btn-secondary" value="Launch">
+                                      </form> 
+                                    {% comment %} <a href="{% url 'chat_page'%}">                                        
+                                        <button type="button" class="btn btn-secondary">Launch</button>
+                                    </a> {% endcomment %}
+                                  </li>
+                                  {% endfor %}
+                                </ul>
+                              </div>
+
+                              <div class="container" style="margin-top: 50px;">
+                                <ul class="list-group">
+                                  <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">
+                                    
+                                    <b style='font-size: 15px'>Want to work with a different team?</b>
+                                    <button type="button" style="background-color: #7f81d6;" class="btn btn-success" id="myBtn">Create New Workspace</button>
+                                  </li>
+                                </ul>
+                            </div>                            
+                        </div>
+                    </div>
+
+                    <!--Invitation Start-->
+                    <div class="card bg-dark text-white" style="border-radius: 1rem; margin-top: 50px">
+                        <div class="card-body p-5 text-center">
+                            <h2>Invitation</h2>
+                            <div class="container" style="margin-top: 20px;">
+                                <ul class="list-group">                              
+                                    {% for invitation in invitations %}
+                                    <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">
+                                        <b style='font-size: 15px'>{{ invitation.workspace.workspaceName}}</b>
+                                        <p class="invitation_by">Sent by {{invitation.send_by.name}}</p>
+                                        <form action="{% url 'invitationAccept'%}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="workspaceID" value="{{invitation.workspace.id}}">
+                                            <input type="hidden" name="invitationID" value="{{invitation.id}}">
+                                            <input type="submit" name="invitation" class="btn btn-success" value="Accept">
+                                            <input type="submit" name="invitation" class="btn btn-danger" value="Delete">
+                                        </form> 
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            <div>
+                        </div>                           
+                    </div>
+                    <!--Invitation End -->
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              
+                <div class="mb-md-5 mt-md-4 ">
+
+                    <h2 class="fw-bold mb-2 text-uppercase">Create New WorkSpace</h2>
+                    <p class="text-white-50 mb-5">Please enter your information</p>
+                    {% if error %}
+                        <p class="text-danger" style="color: #ef6371!important;">{{error}}</p>
+                    {% endif %}
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="form-outline form-white mb-4">
+                            <input type="text" id="typeworkspaceNameX" class="form-control form-control-lg"
+                                placeholder="Enter workspace name" name="workspaceName" required />
+                        </div>
+
+                        <div class="form-outline form-white mb-4">
+                            <input type="text" id="typedescriptionX" class="form-control form-control-lg"
+                                placeholder="Description" name="description" required />
+                        </div>
+
+                        <button class="btn btn-outline-light btn-lg px-5" type="submit">Create</button>
+                    </form>
+                </div>
+
+            </div>
+          
+        </div>
+          <!-- Modal End-->
+    </section>
+
+    <script>
+        
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function () {
+            modal.style.display = "block";
+            console.log("Clicked")
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>
