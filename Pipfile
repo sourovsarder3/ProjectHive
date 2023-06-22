@@ -10,6 +10,7 @@ daphne = "*"
 channels-redis = "*"
 pillow = "*"
 multidict = "*"
+python-decouple = "*"
 
 [dev-packages]
 autopep8 = "*"
